@@ -1,5 +1,8 @@
 /// 앱 전역 상수
 class AppConstants {
+  // 개발 모드 설정
+  static const bool useMockApi = true; // TODO: 프로덕션에서는 false로 변경
+
   // 앱 정보
   static const String appName = 'Eodini';
   static const String appVersion = '1.0.0';
