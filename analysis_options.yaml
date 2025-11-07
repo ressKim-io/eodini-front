@@ -1,0 +1,17 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # 추가 린트 규칙
+    avoid_print: true
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_final_fields: true
+    prefer_final_locals: true
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  errors:
+    invalid_annotation_target: ignore
