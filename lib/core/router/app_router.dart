@@ -6,6 +6,9 @@ import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
 import '../../features/home/screens/home_screen.dart';
+import '../../features/vehicle/screens/vehicle_detail_screen.dart';
+import '../../features/vehicle/screens/vehicle_form_screen.dart';
+import '../../features/vehicle/screens/vehicles_screen.dart';
 
 /// 라우터 Provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -46,9 +49,34 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'home',
         builder: (context, state) => const HomeScreen(),
       ),
+      // 차량 관리
+      GoRoute(
+        path: '/vehicles',
+        name: 'vehicles',
+        builder: (context, state) => const VehiclesScreen(),
+      ),
+      GoRoute(
+        path: '/vehicles/new',
+        name: 'vehicle-new',
+        builder: (context, state) => const VehicleFormScreen(),
+      ),
+      GoRoute(
+        path: '/vehicles/:id',
+        name: 'vehicle-detail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return VehicleDetailScreen(vehicleId: id);
+        },
+      ),
+      GoRoute(
+        path: '/vehicles/:id/edit',
+        name: 'vehicle-edit',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return VehicleFormScreen(vehicleId: id);
+        },
+      ),
       // TODO: 추가 라우트
-      // - /vehicles (차량 목록)
-      // - /vehicles/:id (차량 상세)
       // - /passengers (탑승자 목록)
       // - /trips (운행 목록)
       // - /map (실시간 지도)
