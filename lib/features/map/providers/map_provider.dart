@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/models/route.dart';
 import '../../../core/models/vehicle.dart';
+import '../../../core/services/location_service.dart';
 import '../../../core/services/route_repository.dart';
 import '../../../core/services/vehicle_repository.dart';
 import '../../../core/services/websocket_service.dart';
@@ -82,15 +83,16 @@ class MapState {
 class MapNotifier extends StateNotifier<MapState> {
   final VehicleRepository _vehicleRepository;
   final RouteRepository _routeRepository;
-  final WebSocketService _webSocketService;
+  final LocationService _locationService;
+  final LocationUpdateMode _updateMode;
 
-  StreamSubscription<VehicleLocationUpdate>? _locationSubscription;
-  StreamSubscription<VehicleStatusChange>? _statusSubscription;
+  StreamSubscription<Map<String, VehicleLocationUpdate>>? _locationSubscription;
 
   MapNotifier(
     this._vehicleRepository,
     this._routeRepository,
-    this._webSocketService,
+    this._locationService,
+    this._updateMode,
   ) : super(MapState()) {
     _initialize();
   }
@@ -98,7 +100,7 @@ class MapNotifier extends StateNotifier<MapState> {
   /// 초기화
   Future<void> _initialize() async {
     await loadInitialData();
-    _subscribeToWebSocket();
+    _subscribeToLocationUpdates();
   }
 
   /// 초기 데이터 로드
@@ -144,54 +146,37 @@ class MapNotifier extends StateNotifier<MapState> {
     }
   }
 
-  /// WebSocket 구독
-  void _subscribeToWebSocket() {
-    // 위치 업데이트 구독
-    _locationSubscription = _webSocketService.locationStream.listen(
-      _handleLocationUpdate,
+  /// 위치 업데이트 구독 (Polling 방식)
+  void _subscribeToLocationUpdates() {
+    // Polling 시작
+    _locationService.startPolling();
+
+    // 위치 업데이트 스트림 구독
+    _locationSubscription = _locationService.locationStream.listen(
+      _handleLocationUpdates,
       onError: (error) {
-        // 에러는 로깅만 하고 상태는 유지
         print('Location stream error: $error');
       },
     );
-
-    // 상태 변경 구독
-    _statusSubscription = _webSocketService.statusStream.listen(
-      _handleStatusChange,
-      onError: (error) {
-        print('Status stream error: $error');
-      },
-    );
   }
 
-  /// 위치 업데이트 처리
-  void _handleLocationUpdate(VehicleLocationUpdate update) {
+  /// 위치 업데이트 처리 (일괄 업데이트)
+  void _handleLocationUpdates(Map<String, VehicleLocationUpdate> locationMap) {
     final vehicles = Map<String, VehicleMapInfo>.from(state.vehicles);
 
-    if (vehicles.containsKey(update.vehicleId)) {
-      vehicles[update.vehicleId] = vehicles[update.vehicleId]!.copyWith(
-        location: update,
-      );
+    // 모든 차량의 위치를 한 번에 업데이트
+    for (final entry in locationMap.entries) {
+      final vehicleId = entry.key;
+      final location = entry.value;
 
-      state = state.copyWith(vehicles: vehicles);
+      if (vehicles.containsKey(vehicleId)) {
+        vehicles[vehicleId] = vehicles[vehicleId]!.copyWith(
+          location: location,
+        );
+      }
     }
-  }
 
-  /// 상태 변경 처리
-  void _handleStatusChange(VehicleStatusChange change) {
-    final vehicles = Map<String, VehicleMapInfo>.from(state.vehicles);
-
-    if (vehicles.containsKey(change.vehicleId)) {
-      final updatedVehicle = vehicles[change.vehicleId]!.vehicle.copyWith(
-        status: change.status,
-      );
-
-      vehicles[change.vehicleId] = vehicles[change.vehicleId]!.copyWith(
-        vehicle: updatedVehicle,
-      );
-
-      state = state.copyWith(vehicles: vehicles);
-    }
+    state = state.copyWith(vehicles: vehicles);
   }
 
   /// 차량 선택
@@ -219,10 +204,15 @@ class MapNotifier extends StateNotifier<MapState> {
     await loadInitialData();
   }
 
+  /// Polling 간격 변경
+  void setPollingInterval(int seconds) {
+    _locationService.setPollingInterval(seconds);
+  }
+
   @override
   void dispose() {
     _locationSubscription?.cancel();
-    _statusSubscription?.cancel();
+    _locationService.stopPolling();
     super.dispose();
   }
 }
@@ -231,12 +221,14 @@ class MapNotifier extends StateNotifier<MapState> {
 final mapProvider = StateNotifierProvider<MapNotifier, MapState>((ref) {
   final vehicleRepository = ref.watch(vehicleRepositoryProvider);
   final routeRepository = ref.watch(routeRepositoryProvider);
-  final webSocketService = ref.watch(webSocketServiceProvider);
+  final locationService = ref.watch(locationServiceProvider);
+  final updateMode = ref.watch(locationUpdateModeProvider);
 
   return MapNotifier(
     vehicleRepository,
     routeRepository,
-    webSocketService,
+    locationService,
+    updateMode,
   );
 });
 
