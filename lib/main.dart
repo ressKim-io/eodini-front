@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'core/router/app_router.dart';
+import 'shared/widgets/responsive_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +52,13 @@ class EodiniApp extends ConsumerWidget {
       ),
       themeMode: ThemeMode.system,
       routerConfig: router,
+      builder: (context, child) {
+        // 웹에서 최대 너비 제한
+        return ResponsiveWrapper(
+          maxWidth: 600, // 모바일 너비
+          child: child ?? const SizedBox(),
+        );
+      },
     );
   }
 }
