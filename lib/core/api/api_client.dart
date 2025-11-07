@@ -18,15 +18,27 @@ final dioProvider = Provider<Dio>((ref) {
 });
 
 /// Dio 기본 옵션
-BaseOptions get _baseOptions => BaseOptions(
-      baseUrl: dotenv.env['API_BASE_URL'] ?? 'http://localhost:8080/api/v1',
-      connectTimeout: const Duration(milliseconds: ApiConstants.connectTimeout),
-      receiveTimeout: const Duration(milliseconds: ApiConstants.receiveTimeout),
-      sendTimeout: const Duration(milliseconds: ApiConstants.sendTimeout),
-      headers: {
-        ApiConstants.contentType: ApiConstants.applicationJson,
-      },
-    );
+BaseOptions get _baseOptions {
+  // dotenv가 초기화되지 않았을 경우 기본값 사용
+  String baseUrl = 'http://localhost:8080/api/v1';
+  try {
+    if (dotenv.isInitialized) {
+      baseUrl = dotenv.env['API_BASE_URL'] ?? baseUrl;
+    }
+  } catch (e) {
+    // dotenv 접근 실패 시 기본값 사용
+  }
+
+  return BaseOptions(
+    baseUrl: baseUrl,
+    connectTimeout: const Duration(milliseconds: ApiConstants.connectTimeout),
+    receiveTimeout: const Duration(milliseconds: ApiConstants.receiveTimeout),
+    sendTimeout: const Duration(milliseconds: ApiConstants.sendTimeout),
+    headers: {
+      ApiConstants.contentType: ApiConstants.applicationJson,
+    },
+  );
+}
 
 /// API 클라이언트 클래스
 class ApiClient {
