@@ -83,7 +83,7 @@ class LocationService {
       // Mock 데이터: 각 차량에 대해 랜덤 위치 생성
       final locationMap = <String, VehicleLocationUpdate>{};
 
-      for (final vehicle in response.vehicles) {
+      for (final vehicle in response.items) {
         // TODO: 실제로는 별도의 API 엔드포인트에서 위치 데이터 가져오기
         // GET /vehicles/{id}/location 또는 GET /locations?vehicle_ids=...
 

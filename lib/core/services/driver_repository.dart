@@ -75,7 +75,7 @@ class DriverRepository {
     final response = await _apiClient.get(ApiConstants.driverById(id));
     final apiResponse = ApiResponse.fromJson(
       response.data,
-      (json) => Driver.fromJson(json),
+      (json) => Driver.fromJson(json as Map<String, dynamic>),
     );
 
     return apiResponse.data as Driver;
@@ -95,7 +95,7 @@ class DriverRepository {
     );
     final apiResponse = ApiResponse.fromJson(
       response.data,
-      (json) => Driver.fromJson(json),
+      (json) => Driver.fromJson(json as Map<String, dynamic>),
     );
 
     return apiResponse.data as Driver;
@@ -115,7 +115,7 @@ class DriverRepository {
     );
     final apiResponse = ApiResponse.fromJson(
       response.data,
-      (json) => Driver.fromJson(json),
+      (json) => Driver.fromJson(json as Map<String, dynamic>),
     );
 
     return apiResponse.data as Driver;

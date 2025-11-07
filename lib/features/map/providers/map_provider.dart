@@ -119,7 +119,7 @@ class MapNotifier extends StateNotifier<MapState> {
 
       // 차량 맵 생성
       final vehicleMap = <String, VehicleMapInfo>{};
-      for (final vehicle in vehiclesResponse.vehicles) {
+      for (final vehicle in vehiclesResponse.items) {
         vehicleMap[vehicle.id] = VehicleMapInfo(vehicle: vehicle);
       }
 

@@ -73,7 +73,7 @@ class RouteRepository {
     final response = await _apiClient.get(ApiConstants.routeById(id));
     final apiResponse = ApiResponse.fromJson(
       response.data,
-      (json) => RouteModel.fromJson(json),
+      (json) => RouteModel.fromJson(json as Map<String, dynamic>),
     );
 
     return apiResponse.data as RouteModel;
@@ -107,7 +107,7 @@ class RouteRepository {
     );
     final apiResponse = ApiResponse.fromJson(
       response.data,
-      (json) => RouteModel.fromJson(json),
+      (json) => RouteModel.fromJson(json as Map<String, dynamic>),
     );
 
     return apiResponse.data as RouteModel;
@@ -126,7 +126,7 @@ class RouteRepository {
     );
     final apiResponse = ApiResponse.fromJson(
       response.data,
-      (json) => RouteModel.fromJson(json),
+      (json) => RouteModel.fromJson(json as Map<String, dynamic>),
     );
 
     return apiResponse.data as RouteModel;
