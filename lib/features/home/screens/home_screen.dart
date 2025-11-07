@@ -146,11 +146,7 @@ class HomeScreen extends ConsumerWidget {
                   title: '실시간 위치',
                   subtitle: '차량 위치 추적',
                   color: Colors.orange,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('곧 제공될 예정입니다')),
-                    );
-                  },
+                  onTap: () => context.push('/map'),
                 ),
                 _buildFeatureCard(
                   context,

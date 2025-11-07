@@ -9,6 +9,7 @@ import '../../features/home/screens/home_screen.dart';
 import '../../features/passenger/screens/passenger_detail_screen.dart';
 import '../../features/passenger/screens/passenger_form_screen.dart';
 import '../../features/passenger/screens/passengers_screen.dart';
+import '../../features/map/screens/map_screen.dart';
 import '../../features/trip/screens/trip_detail_screen.dart';
 import '../../features/trip/screens/trips_screen.dart';
 import '../../features/vehicle/screens/vehicle_detail_screen.dart';
@@ -122,8 +123,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           return TripDetailScreen(tripId: id);
         },
       ),
-      // TODO: 추가 라우트
-      // - /map (실시간 지도)
+      // 실시간 지도
+      GoRoute(
+        path: '/map',
+        name: 'map',
+        builder: (context, state) => const MapScreen(),
+      ),
     ],
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(
