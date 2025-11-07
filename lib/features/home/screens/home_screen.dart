@@ -138,11 +138,7 @@ class HomeScreen extends ConsumerWidget {
                   title: '탑승자 관리',
                   subtitle: '학생/직원 정보 관리',
                   color: Colors.green,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('곧 제공될 예정입니다')),
-                    );
-                  },
+                  onTap: () => context.push('/passengers'),
                 ),
                 _buildFeatureCard(
                   context,
