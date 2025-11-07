@@ -19,7 +19,7 @@ final dioProvider = Provider<Dio>((ref) {
 
 /// Dio 기본 옵션
 BaseOptions get _baseOptions => BaseOptions(
-      baseURL: dotenv.env['API_BASE_URL'] ?? 'http://localhost:8080/api/v1',
+      baseUrl: dotenv.env['API_BASE_URL'] ?? 'http://localhost:8080/api/v1',
       connectTimeout: const Duration(milliseconds: ApiConstants.connectTimeout),
       receiveTimeout: const Duration(milliseconds: ApiConstants.receiveTimeout),
       sendTimeout: const Duration(milliseconds: ApiConstants.sendTimeout),
