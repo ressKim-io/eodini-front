@@ -5,11 +5,14 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
+import '../../features/driver/screens/driver_detail_screen.dart';
+import '../../features/driver/screens/driver_form_screen.dart';
+import '../../features/driver/screens/drivers_screen.dart';
 import '../../features/home/screens/home_screen.dart';
+import '../../features/map/screens/map_screen.dart';
 import '../../features/passenger/screens/passenger_detail_screen.dart';
 import '../../features/passenger/screens/passenger_form_screen.dart';
 import '../../features/passenger/screens/passengers_screen.dart';
-import '../../features/map/screens/map_screen.dart';
 import '../../features/trip/screens/trip_detail_screen.dart';
 import '../../features/trip/screens/trips_screen.dart';
 import '../../features/vehicle/screens/vehicle_detail_screen.dart';
@@ -128,6 +131,33 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/map',
         name: 'map',
         builder: (context, state) => const MapScreen(),
+      ),
+      // 기사 관리
+      GoRoute(
+        path: '/drivers',
+        name: 'drivers',
+        builder: (context, state) => const DriversScreen(),
+      ),
+      GoRoute(
+        path: '/drivers/new',
+        name: 'driver-new',
+        builder: (context, state) => const DriverFormScreen(),
+      ),
+      GoRoute(
+        path: '/drivers/:id',
+        name: 'driver-detail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return DriverDetailScreen(driverId: id);
+        },
+      ),
+      GoRoute(
+        path: '/drivers/:id/edit',
+        name: 'driver-edit',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return DriverFormScreen(driverId: id);
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
