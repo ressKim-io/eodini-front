@@ -13,6 +13,8 @@ import '../../features/map/screens/map_screen.dart';
 import '../../features/passenger/screens/passenger_detail_screen.dart';
 import '../../features/passenger/screens/passenger_form_screen.dart';
 import '../../features/passenger/screens/passengers_screen.dart';
+import '../../features/route/screens/route_detail_screen.dart';
+import '../../features/route/screens/routes_screen.dart';
 import '../../features/trip/screens/trip_detail_screen.dart';
 import '../../features/trip/screens/trips_screen.dart';
 import '../../features/vehicle/screens/vehicle_detail_screen.dart';
@@ -157,6 +159,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return DriverFormScreen(driverId: id);
+        },
+      ),
+      // 경로 관리
+      GoRoute(
+        path: '/routes',
+        name: 'routes',
+        builder: (context, state) => const RoutesScreen(),
+      ),
+      GoRoute(
+        path: '/routes/:id',
+        name: 'route-detail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return RouteDetailScreen(routeId: id);
         },
       ),
     ],
