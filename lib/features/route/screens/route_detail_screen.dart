@@ -132,16 +132,14 @@ class RouteDetailScreen extends ConsumerWidget {
                   ),
               textAlign: TextAlign.center,
             ),
-            if (route.description != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                route.description!,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+            const SizedBox(height: 8),
+            Text(
+              route.description,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 12),
             _buildStatusChip(context, route.status),
           ],
@@ -171,7 +169,7 @@ class RouteDetailScreen extends ConsumerWidget {
                     context,
                     icon: Icons.location_on,
                     label: '정류장',
-                    value: '${route.stopCount}개',
+                    value: '${route.stops?.length ?? 0}개',
                     color: Colors.blue,
                   ),
                 ),
@@ -181,7 +179,9 @@ class RouteDetailScreen extends ConsumerWidget {
                     context,
                     icon: Icons.straighten,
                     label: '거리',
-                    value: '${route.distance.toStringAsFixed(1)} km',
+                    value: route.totalDistance != null
+                        ? '${(route.totalDistance! / 1000).toStringAsFixed(1)} km'
+                        : '미정',
                     color: Colors.orange,
                   ),
                 ),
@@ -195,7 +195,7 @@ class RouteDetailScreen extends ConsumerWidget {
                     context,
                     icon: Icons.access_time,
                     label: '예상 소요시간',
-                    value: '${route.estimatedDuration} 분',
+                    value: '${route.estimatedTime} 분',
                     color: Colors.green,
                   ),
                 ),
@@ -427,10 +427,10 @@ class RouteDetailScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-                if (stop.description != null) ...[
+                if (stop.notes != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    stop.description!,
+                    stop.notes!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.outline,
                         ),
@@ -444,7 +444,7 @@ class RouteDetailScreen extends ConsumerWidget {
           const SizedBox(width: 8),
           // 정류장 순서
           Text(
-            '${stop.sequence}번째',
+            '${stop.order}번째',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.outline,
                 ),

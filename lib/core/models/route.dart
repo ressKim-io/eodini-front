@@ -98,3 +98,20 @@ class CreateStopDto with _$CreateStopDto {
   factory CreateStopDto.fromJson(Map<String, dynamic> json) =>
       _$CreateStopDtoFromJson(json);
 }
+
+/// 정류장 업데이트 DTO
+@freezed
+class UpdateStopDto with _$UpdateStopDto {
+  const factory UpdateStopDto({
+    String? name,
+    String? address,
+    int? order,
+    double? latitude,
+    double? longitude,
+    @JsonKey(name: 'estimated_arrival_time') int? estimatedArrivalTime,
+    String? notes,
+  }) = _UpdateStopDto;
+
+  factory UpdateStopDto.fromJson(Map<String, dynamic> json) =>
+      _$UpdateStopDtoFromJson(json);
+}

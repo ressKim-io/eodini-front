@@ -77,12 +77,21 @@ class RouteListNotifier extends StateNotifier<RouteListState> {
         page: page,
         limit: 20,
         status: state.statusFilter,
-        search: state.searchQuery.isEmpty ? null : state.searchQuery,
       );
+
+      // 클라이언트 사이드 검색 필터링
+      var filteredRoutes = response.routes;
+      if (state.searchQuery.isNotEmpty) {
+        filteredRoutes = response.routes.where((route) {
+          final query = state.searchQuery.toLowerCase();
+          return route.name.toLowerCase().contains(query) ||
+                 route.description.toLowerCase().contains(query);
+        }).toList();
+      }
 
       state = state.copyWith(
         routes: response.routes,
-        filteredRoutes: response.routes,
+        filteredRoutes: filteredRoutes,
         currentPage: response.page,
         totalPages: response.totalPages,
         totalItems: response.totalItems,
@@ -234,29 +243,6 @@ class RouteActions {
     await _repository.deleteRoute(id);
     // 목록 새로고침
     _ref.read(routeListProvider.notifier).refresh();
-  }
-
-  /// 정류장 추가
-  Future<Stop> addStop(String routeId, CreateStopDto dto) async {
-    final stop = await _repository.addStop(routeId, dto);
-    // 해당 경로 새로고침
-    _ref.read(routeProvider(routeId).notifier).refresh();
-    return stop;
-  }
-
-  /// 정류장 수정
-  Future<Stop> updateStop(String routeId, String stopId, UpdateStopDto dto) async {
-    final stop = await _repository.updateStop(routeId, stopId, dto);
-    // 해당 경로 새로고침
-    _ref.read(routeProvider(routeId).notifier).refresh();
-    return stop;
-  }
-
-  /// 정류장 삭제
-  Future<void> deleteStop(String routeId, String stopId) async {
-    await _repository.deleteStop(routeId, stopId);
-    // 해당 경로 새로고침
-    _ref.read(routeProvider(routeId).notifier).refresh();
   }
 }
 

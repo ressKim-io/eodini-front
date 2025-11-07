@@ -256,7 +256,7 @@ class _RoutesScreenState extends ConsumerState<RoutesScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          route.description ?? '설명 없음',
+                          route.description,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: Theme.of(context).colorScheme.outline,
                               ),
@@ -276,19 +276,21 @@ class _RoutesScreenState extends ConsumerState<RoutesScreen> {
                   _buildInfoChip(
                     context,
                     icon: Icons.location_on,
-                    label: '${route.stopCount}개 정류장',
+                    label: '${route.stops?.length ?? 0}개 정류장',
                   ),
                   const SizedBox(width: 12),
                   _buildInfoChip(
                     context,
                     icon: Icons.straighten,
-                    label: '${route.distance.toStringAsFixed(1)} km',
+                    label: route.totalDistance != null
+                        ? '${(route.totalDistance! / 1000).toStringAsFixed(1)} km'
+                        : '미정',
                   ),
                   const SizedBox(width: 12),
                   _buildInfoChip(
                     context,
                     icon: Icons.access_time,
-                    label: '${route.estimatedDuration} 분',
+                    label: '${route.estimatedTime} 분',
                   ),
                 ],
               ),
