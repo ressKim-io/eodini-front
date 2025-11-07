@@ -158,11 +158,7 @@ class HomeScreen extends ConsumerWidget {
                   title: '운행 관리',
                   subtitle: '운행 일정 및 기록',
                   color: Colors.purple,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('곧 제공될 예정입니다')),
-                    );
-                  },
+                  onTap: () => context.push('/trips'),
                 ),
               ],
             ),

@@ -9,6 +9,8 @@ import '../../features/home/screens/home_screen.dart';
 import '../../features/passenger/screens/passenger_detail_screen.dart';
 import '../../features/passenger/screens/passenger_form_screen.dart';
 import '../../features/passenger/screens/passengers_screen.dart';
+import '../../features/trip/screens/trip_detail_screen.dart';
+import '../../features/trip/screens/trips_screen.dart';
 import '../../features/vehicle/screens/vehicle_detail_screen.dart';
 import '../../features/vehicle/screens/vehicle_form_screen.dart';
 import '../../features/vehicle/screens/vehicles_screen.dart';
@@ -106,8 +108,21 @@ final routerProvider = Provider<GoRouter>((ref) {
           return PassengerFormScreen(passengerId: id);
         },
       ),
+      // 운행 관리
+      GoRoute(
+        path: '/trips',
+        name: 'trips',
+        builder: (context, state) => const TripsScreen(),
+      ),
+      GoRoute(
+        path: '/trips/:id',
+        name: 'trip-detail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return TripDetailScreen(tripId: id);
+        },
+      ),
       // TODO: 추가 라우트
-      // - /trips (운행 목록)
       // - /map (실시간 지도)
     ],
     errorBuilder: (context, state) => Scaffold(
