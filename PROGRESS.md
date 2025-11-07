@@ -294,14 +294,66 @@
 - ✅ 실시간 위치 기능 네비게이션 활성화
 
 #### 주요 기능
-- ✅ 실시간 차량 위치 추적 (WebSocket)
+- ✅ 실시간 차량 위치 추적 (HTTP Polling, 10-30초 간격)
 - ✅ 경로 및 정류장 표시
 - ✅ 차량 상태별 시각화
 - ✅ 필터 기능 (차량/경로/정류장)
 - ✅ 차량 선택 시 상세 정보 표시
 - ✅ 경로 선택 시 정보 표시
-- ✅ WebSocket 자동 재연결
 - ✅ Mock API 모드 지원
+
+---
+
+### 7차: 실시간 위치 Polling 리팩토링 + 백엔드 문서화 (Commit: 47b672f)
+
+#### 위치 업데이트 방식 변경
+- ✅ **LocationService** (`location_service.dart`)
+  - WebSocket → HTTP Polling 전환
+  - 10-30초 간격으로 API 호출 (AppConstants.locationUpdateInterval)
+  - Timer 기반 주기적 업데이트
+  - 일괄 위치 업데이트 (Map<vehicleId, location>)
+  - Polling 간격 변경 기능 (5-60초)
+  - Mock 위치 데이터 생성
+
+#### 기술 선택 이유
+- **Polling이 더 적합한 이유:**
+  - 10-30초 간격 업데이트에는 WebSocket이 과함
+  - 구현 단순, 서버 리소스 절약
+  - 네트워크 재연결 처리 쉬움
+  - WebSocket은 1초 이하 실시간이 필요할 때 유용
+- **WebSocket은 옵션으로 유지** (향후 긴급 이벤트용)
+
+#### MapProvider 리팩토링
+- `MapNotifier`에서 LocationService 사용
+- 일괄 위치 업데이트 처리 최적화
+- Polling 간격 동적 변경 기능
+
+#### 백엔드 개발 요구사항 문서
+- ✅ **BACKEND_REQUIREMENTS.md** 생성
+  - 프론트엔드 진행률: 약 80% 완료
+  - 백엔드보다 빠르게 진행됨에 따라 문서화
+
+**문서 내용:**
+- 우선순위별 API 목록 (P0~P3)
+- 필수 API 상세 명세 (Request/Response)
+- 데이터 모델 및 Enum 타입 정의
+- 실시간 위치 API 요구사항 (Polling 방식)
+- Kafka + FCM 알림 아키텍처 제안
+- 보안/인증 요구사항 (JWT)
+- 성능 요구사항 (응답시간, 동시접속)
+- 개발 타임라인 (Week 1-4+)
+- 에러 코드 정의
+
+**주요 API 우선순위:**
+- **P0 (즉시)**: 인증, 차량, 탑승자 CRUD
+- **P1 (1주일)**: 운행 관리, 경로, **실시간 위치 API**
+- **P2 (2주일)**: 기사, 일정
+- **P3 (추후)**: 알림
+
+**알림 시스템 제안:**
+```
+백엔드 → Kafka → 알림 Worker → FCM → Flutter 앱
+```
 
 ---
 
