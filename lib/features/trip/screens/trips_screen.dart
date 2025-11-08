@@ -142,7 +142,7 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
 
   /// 운행 카드 UI
   Widget _buildTripCard(Trip trip) {
-    final dateFormat = DateFormat('yyyy-MM-dd (E)', 'ko_KR');
+    final dateFormat = DateFormat('yyyy-MM-dd');
     final timeFormat = DateFormat('HH:mm');
 
     return Card(

@@ -132,7 +132,7 @@ class TripDetailScreen extends ConsumerWidget {
 
   /// 헤더
   Widget _buildHeader(BuildContext context, Trip trip) {
-    final dateFormat = DateFormat('yyyy년 MM월 dd일 (E)', 'ko_KR');
+    final dateFormat = DateFormat('yyyy년 MM월 dd일');
 
     return Card(
       child: Padding(
