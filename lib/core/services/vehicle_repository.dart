@@ -250,3 +250,9 @@ class PaginatedVehicles {
     );
   }
 }
+
+/// VehicleRepository Provider
+final vehicleRepositoryProvider = Provider<VehicleRepository>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return VehicleRepository(apiClient);
+});
