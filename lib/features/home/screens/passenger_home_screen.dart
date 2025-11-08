@@ -78,8 +78,8 @@ class _PassengerHomeScreenState extends ConsumerState<PassengerHomeScreen> {
           isAlighted: false,
           boardedAt: null,
           alightedAt: null,
-          boardedLocation: null,
-          alightedLocation: null,
+          createdAt: DateTime.now().subtract(const Duration(days: 1)),
+          updatedAt: DateTime.now(),
         ),
       ],
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
@@ -100,7 +100,6 @@ class _PassengerHomeScreenState extends ConsumerState<PassengerHomeScreen> {
       insuranceExpiry: DateTime.now().add(const Duration(days: 200)),
       inspectionExpiry: DateTime.now().add(const Duration(days: 100)),
       lastMaintenanceAt: DateTime.now().subtract(const Duration(days: 10)),
-      notes: '',
       createdAt: DateTime.now().subtract(const Duration(days: 180)),
       updatedAt: DateTime.now(),
     );
@@ -118,7 +117,6 @@ class _PassengerHomeScreenState extends ConsumerState<PassengerHomeScreen> {
       address: '서울시 강남구',
       hireDate: DateTime.now().subtract(const Duration(days: 365)),
       emergencyContact: '010-4444-5555',
-      notes: '',
       createdAt: DateTime.now().subtract(const Duration(days: 365)),
       updatedAt: DateTime.now(),
     );
@@ -254,7 +252,7 @@ class _PassengerHomeScreenState extends ConsumerState<PassengerHomeScreen> {
     }
 
     final tripPassenger =
-        _todayTrip!.tripPassengers.firstWhere((tp) => tp.passengerId == _me.id);
+        _todayTrip!.tripPassengers?.firstWhere((tp) => tp.passengerId == _me.id);
 
     return Card(
       color: _getTripStatusColor(),
@@ -295,8 +293,8 @@ class _PassengerHomeScreenState extends ConsumerState<PassengerHomeScreen> {
                   _buildStatusItem(
                     icon: Icons.login,
                     label: '탑승',
-                    value: tripPassenger.isBoarded ? '완료' : '대기',
-                    isCompleted: tripPassenger.isBoarded,
+                    value: tripPassenger?.isBoarded == true ? '완료' : '대기',
+                    isCompleted: tripPassenger?.isBoarded == true,
                   ),
                   Container(
                     width: 1,
@@ -306,8 +304,8 @@ class _PassengerHomeScreenState extends ConsumerState<PassengerHomeScreen> {
                   _buildStatusItem(
                     icon: Icons.logout,
                     label: '하차',
-                    value: tripPassenger.isAlighted ? '완료' : '대기',
-                    isCompleted: tripPassenger.isAlighted,
+                    value: tripPassenger?.isAlighted == true ? '완료' : '대기',
+                    isCompleted: tripPassenger?.isAlighted == true,
                   ),
                 ],
               ),

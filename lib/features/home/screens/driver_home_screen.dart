@@ -45,8 +45,9 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
         name: '김기사',
         phone: '010-1234-5678',
         licenseNumber: '11-12-345678-90',
-        licenseType: DriverLicenseType.type1Regular,
+        licenseType: LicenseType.type1Regular,
         licenseExpiry: DateTime(2027, 12, 31),
+        hireDate: DateTime.now().subtract(const Duration(days: 365)),
         status: DriverStatus.active,
         emergencyContact: '010-8765-4321',
         createdAt: DateTime.now().subtract(const Duration(days: 365)),
@@ -56,15 +57,15 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
       // Mock 배정 차량
       _assignedVehicle = Vehicle(
         id: 'vehicle-1',
-        licensePlate: '12가3456',
+        plateNumber: '12가3456',
         model: '스타렉스',
         manufacturer: '현대',
         year: 2023,
         capacity: 11,
+        color: '흰색',
         vehicleType: VehicleType.van,
         status: VehicleStatus.active,
-        lastMaintenanceDate: DateTime.now().subtract(const Duration(days: 30)),
-        nextMaintenanceDate: DateTime.now().add(const Duration(days: 60)),
+        lastMaintenanceAt: DateTime.now().subtract(const Duration(days: 30)),
         createdAt: DateTime.now().subtract(const Duration(days: 365)),
         updatedAt: DateTime.now(),
       );
@@ -74,27 +75,21 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
       _todayTrips = [
         Trip(
           id: 'trip-morning',
-          routeId: 'route-1',
-          routeName: '강남 A코스',
+          scheduleId: 'schedule-1',
+          date: DateTime(now.year, now.month, now.day, 8, 0),
           vehicleId: 'vehicle-1',
-          vehicleName: '12가3456',
-          driverId: 'driver-1',
-          driverName: '김기사',
-          scheduledDate: DateTime(now.year, now.month, now.day, 8, 0),
-          status: TripStatus.scheduled,
+          assignedDriverId: 'driver-1',
+          status: TripStatus.pending,
           createdAt: DateTime.now().subtract(const Duration(hours: 2)),
           updatedAt: DateTime.now(),
         ),
         Trip(
           id: 'trip-afternoon',
-          routeId: 'route-1',
-          routeName: '강남 A코스',
+          scheduleId: 'schedule-1',
+          date: DateTime(now.year, now.month, now.day, 15, 30),
           vehicleId: 'vehicle-1',
-          vehicleName: '12가3456',
-          driverId: 'driver-1',
-          driverName: '김기사',
-          scheduledDate: DateTime(now.year, now.month, now.day, 15, 30),
-          status: TripStatus.scheduled,
+          assignedDriverId: 'driver-1',
+          status: TripStatus.pending,
           createdAt: DateTime.now().subtract(const Duration(hours: 2)),
           updatedAt: DateTime.now(),
         ),
@@ -105,8 +100,8 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
         Passenger(
           id: 'passenger-1',
           name: '김철수',
-          birthYear: 2015,
-          gender: PassengerGender.male,
+          age: DateTime.now().year - 2015,
+          gender: 'male',
           guardianName: '김부모',
           guardianPhone: '010-1111-2222',
           guardianRelation: '부',
@@ -114,14 +109,17 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
           emergencyContact: '010-3333-4444',
           emergencyRelation: '모',
           status: PassengerStatus.active,
+          assignedRouteId: 'route-1',
+          assignedStopId: 'stop-1',
+          stopOrder: 1,
           createdAt: DateTime.now().subtract(const Duration(days: 180)),
           updatedAt: DateTime.now(),
         ),
         Passenger(
           id: 'passenger-2',
           name: '이영희',
-          birthYear: 2016,
-          gender: PassengerGender.female,
+          age: DateTime.now().year - 2016,
+          gender: 'female',
           guardianName: '이부모',
           guardianPhone: '010-2222-3333',
           guardianRelation: '모',
@@ -130,14 +128,17 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
           emergencyRelation: '부',
           medicalNotes: '알레르기: 땅콩',
           status: PassengerStatus.active,
+          assignedRouteId: 'route-1',
+          assignedStopId: 'stop-2',
+          stopOrder: 2,
           createdAt: DateTime.now().subtract(const Duration(days: 150)),
           updatedAt: DateTime.now(),
         ),
         Passenger(
           id: 'passenger-3',
           name: '박민수',
-          birthYear: 2014,
-          gender: PassengerGender.male,
+          age: DateTime.now().year - 2014,
+          gender: 'male',
           guardianName: '박부모',
           guardianPhone: '010-5555-6666',
           guardianRelation: '부',
@@ -145,6 +146,9 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
           emergencyContact: '010-7777-8888',
           emergencyRelation: '모',
           status: PassengerStatus.active,
+          assignedRouteId: 'route-1',
+          assignedStopId: 'stop-3',
+          stopOrder: 3,
           createdAt: DateTime.now().subtract(const Duration(days: 200)),
           updatedAt: DateTime.now(),
         ),
@@ -155,7 +159,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
   }
 
   String _getTripTimeLabel(Trip trip) {
-    final hour = trip.scheduledDate.hour;
+    final hour = trip.date.hour;
     if (hour < 12) return '등원';
     if (hour < 18) return '하원';
     return '야간';
@@ -163,7 +167,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
 
   Color _getTripStatusColor(TripStatus status, ThemeData theme) {
     switch (status) {
-      case TripStatus.scheduled:
+      case TripStatus.pending:
         return theme.colorScheme.primary;
       case TripStatus.inProgress:
         return Colors.green;
@@ -176,7 +180,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
 
   String _getTripStatusLabel(TripStatus status) {
     switch (status) {
-      case TripStatus.scheduled:
+      case TripStatus.pending:
         return '예정';
       case TripStatus.inProgress:
         return '운행중';
@@ -307,7 +311,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _assignedVehicle!.licensePlate,
+                                _assignedVehicle!.plateNumber,
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -434,7 +438,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
                                   ),
                                 ),
                                 const Spacer(),
-                                if (trip.status == TripStatus.scheduled)
+                                if (trip.status == TripStatus.pending)
                                   FilledButton.tonal(
                                     onPressed: () {
                                       // TODO: 운행 시작
@@ -470,7 +474,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  trip.routeName,
+                                  '강남 A코스', // TODO: 실제로는 Schedule에서 Route 정보를 가져와야 함
                                   style: theme.textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -487,7 +491,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  '${trip.scheduledDate.hour.toString().padLeft(2, '0')}:${trip.scheduledDate.minute.toString().padLeft(2, '0')} 출발',
+                                  '${trip.date.hour.toString().padLeft(2, '0')}:${trip.date.minute.toString().padLeft(2, '0')} 출발',
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,
                                   ),
@@ -523,7 +527,6 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
               ),
               const SizedBox(height: 12),
               ..._passengers.map((passenger) {
-                final age = DateTime.now().year - passenger.birthYear;
                 return Card(
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
@@ -544,7 +547,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('$age세 · ${passenger.guardianName} (${passenger.guardianRelation})'),
+                        Text('${passenger.age}세 · ${passenger.guardianName} (${passenger.guardianRelation})'),
                         if (passenger.medicalNotes != null)
                           Text(
                             passenger.medicalNotes!,
