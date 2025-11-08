@@ -15,6 +15,8 @@ import '../../features/passenger/screens/passenger_form_screen.dart';
 import '../../features/passenger/screens/passengers_screen.dart';
 import '../../features/route/screens/route_detail_screen.dart';
 import '../../features/route/screens/routes_screen.dart';
+import '../../features/schedule/screens/schedule_detail_screen.dart';
+import '../../features/schedule/screens/schedules_screen.dart';
 import '../../features/trip/screens/trip_detail_screen.dart';
 import '../../features/trip/screens/trips_screen.dart';
 import '../../features/vehicle/screens/vehicle_detail_screen.dart';
@@ -173,6 +175,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return RouteDetailScreen(routeId: id);
+        },
+      ),
+      // 일정 관리
+      GoRoute(
+        path: '/schedules',
+        name: 'schedules',
+        builder: (context, state) => const SchedulesScreen(),
+      ),
+      GoRoute(
+        path: '/schedules/:id',
+        name: 'schedule-detail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return ScheduleDetailScreen(scheduleId: id);
         },
       ),
     ],
