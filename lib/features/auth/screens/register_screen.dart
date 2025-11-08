@@ -78,6 +78,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         return '학부모';
       case UserRole.attendant:
         return '동승자';
+      case UserRole.passenger:
+        return '일반 탑승자';
     }
   }
 
