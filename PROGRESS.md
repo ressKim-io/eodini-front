@@ -357,6 +357,178 @@
 
 ---
 
+### 8차: 기사 관리 기능 구현 (Commit: f1e0e17)
+
+#### 데이터 레이어
+- ✅ **DriverRepository** (`driver_repository.dart`)
+  - CRUD API 통신 (조회, 생성, 수정, 삭제)
+  - 페이지네이션 지원
+  - 검색 기능 (이름, 전화번호, 이메일)
+  - 상태 필터 (활동중, 휴가중, 비활성)
+  - Mock 데이터 지원 (20명 기사)
+  - 면허 만료일 시뮬레이션 (만료, 만료 임박, 여유)
+
+- ✅ **DriverProvider** (`driver_provider.dart`)
+  - `DriverListNotifier` - 목록 상태 관리
+  - `DriverNotifier` - 개별 기사 상태 관리
+  - `DriverActions` - CRUD 액션
+
+#### UI 화면
+- ✅ **DriversScreen** - 기사 목록 화면
+  - 검색창 (이름, 전화번호, 이메일)
+  - 상태 필터 칩 (활동중, 휴가중, 비활성)
+  - 면허 만료일 경고 표시
+    - 🔴 만료된 면허 (빨간색)
+    - 🟠 30일 이내 만료 예정 (주황색)
+  - 페이지네이션
+  - Pull-to-refresh
+
+- ✅ **DriverDetailScreen** - 기사 상세 화면
+  - 기본 정보 (이름, 전화번호, 이메일, 주소)
+  - 면허 정보 (면허번호, 면허 종류, 만료일)
+  - 비상 연락처
+  - 면허 만료 경고 배너 (만료/임박 시)
+  - 수정/삭제 액션
+
+- ✅ **DriverFormScreen** - 기사 추가/수정 화면
+  - 폼 유효성 검사
+  - 면허 종류 드롭다운 (1종 보통/대형, 2종 보통)
+  - 면허 만료일 선택기
+  - 수정 모드에서 면허번호 변경 불가
+  - 상태 변경 (수정 모드만)
+
+#### 라우팅
+- ✅ `/drivers` - 기사 목록
+- ✅ `/drivers/new` - 기사 추가
+- ✅ `/drivers/:id` - 기사 상세
+- ✅ `/drivers/:id/edit` - 기사 수정
+
+#### 홈 화면 개선
+- ✅ 기사 관리 기능 네비게이션 활성화 (5번째 카드)
+
+---
+
+### 9차: 경로 관리 기능 구현 (Commit: 93968ab)
+
+#### 데이터 레이어
+- ✅ **RouteRepository** - 이미 존재 (지도 기능에서 구현됨)
+  - 10개 Mock 경로, 각 4-6개 정류장
+  - 서울 주요 지역 좌표
+
+- ✅ **RouteProvider** (`route_provider.dart`)
+  - `RouteListNotifier` - 목록 상태 관리
+  - `RouteNotifier` - 개별 경로 상태 관리
+  - `RouteActions` - CRUD 액션
+  - 클라이언트 사이드 검색 필터링
+
+#### UI 화면
+- ✅ **RoutesScreen** - 경로 목록 화면
+  - 검색바 (경로명, 설명 검색)
+  - 상태 필터 칩 (전체, 활성, 비활성)
+  - 각 경로 카드 표시:
+    - 정류장 개수
+    - 거리 (km)
+    - 예상 소요시간 (분)
+  - 페이지네이션
+
+- ✅ **RouteDetailScreen** - 경로 상세 화면
+  - 기본 정보 (정류장 개수, 거리, 예상 소요시간)
+  - 정류장 목록
+    - 순서대로 번호 표시
+    - 🟢 첫 정류장 "출발" 표시
+    - 🔴 마지막 정류장 "도착" 표시
+    - 좌표 정보
+  - 수정/삭제 액션
+
+#### 라우팅
+- ✅ `/routes` - 경로 목록
+- ✅ `/routes/:id` - 경로 상세
+
+#### 홈 화면 개선
+- ✅ 경로 관리 기능 네비게이션 활성화 (6번째 카드)
+
+#### 버그 수정
+- ✅ RouteModel 필드명 수정 (Commit: a78cdf9)
+  - `stopCount` → `stops?.length`
+  - `distance` → `totalDistance` (미터→km 변환)
+  - `estimatedDuration` → `estimatedTime`
+  - Stop 모델: `sequence` → `order`, `description` → `notes`
+  - UpdateStopDto 추가
+
+---
+
+### 10차: 일정 관리 기능 구현 (Commit: 304afad)
+
+#### 데이터 레이어
+- ✅ **ScheduleRepository** (`schedule_repository.dart`)
+  - CRUD API 통신 (생성, 조회, 수정, 삭제)
+  - Mock 데이터 20개 생성
+  - 필터링 지원 (상태, 시간대, 경로, 차량)
+  - **시간대별 일정:**
+    - 🌞 오전 (08:00) - 등교 노선
+    - ☁️ 오후 (14:00) - 하교 노선
+    - 🌙 저녁 (18:00) - 귀가 노선
+  - **요일별 패턴:**
+    - 평일 (월~금)
+    - 주말 (토~일)
+    - 특정 요일 (월/수/금, 화/목)
+  - 유효기간 설정 (validFrom, validTo)
+
+- ✅ **ScheduleProvider** (`schedule_provider.dart`)
+  - `ScheduleListNotifier` - 목록 상태 관리
+  - `ScheduleNotifier` - 개별 일정 상태 관리
+  - `ScheduleActions` - CRUD 액션
+  - 이중 필터 (상태 + 시간대)
+
+#### UI 화면
+- ✅ **SchedulesScreen** - 일정 목록 화면
+  - 검색바 (일정명, 설명 검색)
+  - **이중 필터:**
+    - 상태: 전체/활성/비활성
+    - 시간대: 전체/오전/오후/저녁
+  - 각 일정 카드 표시:
+    - 시간대 아이콘 및 색상 구분
+    - 출발 시간 (큰 글씨)
+    - 운행 요일 (평일/주말/특정요일)
+    - 경로/차량 정보
+  - 페이지네이션
+
+- ✅ **ScheduleDetailScreen** - 일정 상세 화면
+  - **기본 정보:** 출발 시간, 운행 요일
+  - **운행 정보:** 경로, 차량, 기사, 동승자
+  - **유효기간 정보:**
+    - 시작일/종료일
+    - 유효/만료 상태 표시
+    - 마지막 업데이트
+  - 수정/삭제 액션
+
+#### 라우팅
+- ✅ `/schedules` - 일정 목록
+- ✅ `/schedules/:id` - 일정 상세
+
+#### 홈 화면 개선
+- ✅ 일정 관리 기능 네비게이션 활성화 (7번째 카드)
+
+---
+
+### 버그 수정 (2025-11-08)
+
+#### vehicleRepositoryProvider 누락 (Commit: 72da201, db8756b)
+- ✅ `vehicle_repository.dart`에 Provider 추가
+- ✅ 필수 import 추가 (flutter_riverpod, api_response, api_constants)
+- ✅ map_provider.dart와 location_service.dart에서 사용되는 provider 수정
+
+#### Google Maps 웹 지원 (Commit: e5bcfcc)
+- ✅ `web/index.html`에 Google Maps JavaScript API 스크립트 추가
+- ✅ 실시간 위치 화면 오류 수정: `Cannot read properties of undefined (reading 'maps')`
+
+#### DateFormat 로케일 오류 (Commit: 17dd4c4)
+- ✅ `trips_screen.dart`: 한국어 로케일('ko_KR') 제거
+- ✅ `trip_detail_screen.dart`: 한국어 로케일('ko_KR') 제거
+- ✅ 운행 관리 화면 오류 수정: `LocaleDataException`
+
+---
+
 ## 🚧 진행 중인 작업
 
 없음
@@ -365,29 +537,8 @@
 
 ## 📋 다음 단계 (우선순위순)
 
-### 1. 기사 관리 기능 👨‍✈️
-**우선순위: 낮음**
-
-- [ ] `driver_repository.dart`
-- [ ] `drivers_screen.dart`
-- [ ] 기사 CRUD
-- [ ] 면허 만료일 알림
-
----
-
-### 2. 경로/일정 관리 🛣️
-**우선순위: 낮음**
-
-- [x] `route_repository.dart` (지도 기능에서 구현 완료)
-- [ ] `schedule_repository.dart`
-- [ ] 경로 생성/수정 UI
-- [ ] 정류장 관리 UI
-- [ ] 일정 템플릿 관리
-
----
-
-### 3. 알림 기능 🔔
-**우선순위: 낮음**
+### 1. 알림 기능 🔔
+**우선순위: 중간**
 
 - [ ] FCM 통합 (Firebase Cloud Messaging)
 - [ ] 푸시 알림
@@ -396,7 +547,7 @@
 
 ---
 
-### 4. 추가 기능
+### 2. 추가 기능
 **우선순위: 낮음**
 
 - [ ] 다크모드 전환 스위치
@@ -441,6 +592,9 @@ flutter pub run build_runner build --delete-conflicting-outputs
 4. ✅ 탑승자 관리 기능 구현
 5. ✅ 운행 관리 기능 구현
 6. ✅ 실시간 지도 통합
+7. ✅ 기사 관리 기능 구현
+8. ✅ 경로 관리 기능 구현
+9. ✅ 일정 관리 기능 구현
 
 ---
 
@@ -448,11 +602,13 @@ flutter pub run build_runner build --delete-conflicting-outputs
 
 1. ✅ 차량, 탑승자, 운행 관리 완성
 2. ✅ 실시간 위치 추적 구현
-3. 🎯 실시간 위치 추적 안정화 및 테스트 (다음 단계)
-4. 기사 관리 기능 구현
-5. 알림 시스템 구현
-6. 테스트 코드 작성
-7. 성능 최적화
+3. ✅ 기사 관리 기능 구현
+4. ✅ 경로 관리 기능 구현
+5. ✅ 일정 관리 기능 구현
+6. ✅ **핵심 기능 완성** (인증, 차량, 탑승자, 기사, 경로, 운행, 일정, 실시간 지도)
+7. 🎯 알림 시스템 구현 (다음 단계)
+8. 테스트 코드 작성
+9. 성능 최적화
 
 ---
 
@@ -472,4 +628,39 @@ flutter pub run build_runner build --delete-conflicting-outputs
 
 ---
 
-**마지막 업데이트**: 2025-11-07
+**마지막 업데이트**: 2025-11-08
+
+## 📊 현재 진행률
+
+### 완성된 화면 (100%)
+1. ✅ 로그인/회원가입
+2. ✅ 홈 화면 (7개 기능 카드)
+3. ✅ 차량 관리 (목록/상세/추가/수정)
+4. ✅ 탑승자 관리 (목록/상세/추가/수정)
+5. ✅ 기사 관리 (목록/상세/추가/수정)
+6. ✅ 경로 관리 (목록/상세)
+7. ✅ 일정 관리 (목록/상세)
+8. ✅ 운행 관리 (목록/상세)
+9. ✅ 실시간 위치 추적 (Google Maps)
+
+### Mock 데이터 현황
+- 차량: 35개
+- 탑승자: 50명
+- 기사: 20명
+- 경로: 10개 (각 4-6개 정류장)
+- 일정: 20개
+- 운행: 30개
+
+### 주요 기능
+- ✅ JWT 인증 (자동 로그인, 토큰 갱신)
+- ✅ CRUD 완전 구현 (모든 엔티티)
+- ✅ 검색 및 필터링
+- ✅ 페이지네이션
+- ✅ 실시간 위치 업데이트 (HTTP Polling)
+- ✅ 상태 관리 (Riverpod)
+- ✅ 라우팅 (go_router)
+
+### 다음 단계
+- 🎯 FCM 푸시 알림
+- 🎯 테스트 코드 작성
+- 🎯 성능 최적화
