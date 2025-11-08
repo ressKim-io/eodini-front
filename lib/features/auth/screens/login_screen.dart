@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  final String? selectedRole;
+
+  const LoginScreen({super.key, this.selectedRole});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -53,7 +55,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _navigateToRegister() {
-    context.push('/register/select');
+    // 선택한 역할에 따라 적절한 회원가입 화면으로 이동
+    final role = widget.selectedRole;
+    if (role == 'parent') {
+      context.push('/register/parent');
+    } else if (role == 'passenger') {
+      context.push('/register/passenger');
+    } else if (role == 'driver') {
+      context.push('/register/driver');
+    } else if (role == 'admin') {
+      context.push('/register'); // 관리자는 기존 회원가입 화면
+    } else {
+      context.push('/register/select'); // 역할 선택 안 한 경우
+    }
+  }
+
+  String _getRoleDisplayName() {
+    switch (widget.selectedRole) {
+      case 'parent':
+        return '보호자';
+      case 'passenger':
+        return '일반 사용자';
+      case 'admin':
+        return '관리자';
+      case 'driver':
+        return '운전자';
+      default:
+        return '';
+    }
   }
 
   @override
@@ -62,6 +91,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/welcome'),
+        ),
+        title: widget.selectedRole != null
+            ? Text('${_getRoleDisplayName()} 로그인')
+            : const Text('로그인'),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -88,14 +126,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    '실시간 통학/통근 차량 관리',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                  if (widget.selectedRole != null) ...[
+                    Chip(
+                      label: Text(_getRoleDisplayName()),
+                      backgroundColor: theme.colorScheme.secondaryContainer,
+                      avatar: const Icon(Icons.check_circle, size: 18),
                     ),
-                  ),
-                  const SizedBox(height: 48),
+                    const SizedBox(height: 24),
+                  ] else ...[
+                    Text(
+                      '실시간 통학/통근 차량 관리',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+                  ],
 
                   // 이메일 입력
                   TextFormField(

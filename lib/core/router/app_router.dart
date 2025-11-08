@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/providers/auth_provider.dart';
+import '../../features/auth/screens/welcome_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
 import '../../features/auth/screens/user_type_selection_screen.dart';
@@ -32,9 +33,10 @@ final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
 
   return GoRouter(
-    initialLocation: authState.isAuthenticated ? '/home' : '/login',
+    initialLocation: authState.isAuthenticated ? '/home' : '/welcome',
     redirect: (context, state) {
       final isAuthenticated = authState.isAuthenticated;
+      final isWelcome = state.matchedLocation == '/welcome';
       final isLoggingIn = state.matchedLocation == '/login';
       final isRegistering = state.matchedLocation == '/register' ||
           state.matchedLocation == '/register/select' ||
@@ -42,13 +44,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           state.matchedLocation == '/register/passenger' ||
           state.matchedLocation == '/register/driver';
 
-      // 인증되지 않은 사용자가 로그인/회원가입 페이지가 아닌 곳에 접근하려고 하면 로그인 페이지로
-      if (!isAuthenticated && !isLoggingIn && !isRegistering) {
-        return '/login';
+      // 인증되지 않은 사용자가 웰컴/로그인/회원가입 페이지가 아닌 곳에 접근하려고 하면 웰컴 페이지로
+      if (!isAuthenticated && !isWelcome && !isLoggingIn && !isRegistering) {
+        return '/welcome';
       }
 
-      // 이미 인증된 사용자가 로그인 페이지에 접근하려고 하면 홈으로
-      if (isAuthenticated && (isLoggingIn || isRegistering)) {
+      // 이미 인증된 사용자가 웰컴/로그인 페이지에 접근하려고 하면 홈으로
+      if (isAuthenticated && (isWelcome || isLoggingIn || isRegistering)) {
         return '/home';
       }
 
@@ -56,9 +58,17 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(
+        path: '/welcome',
+        name: 'welcome',
+        builder: (context, state) => const WelcomeScreen(),
+      ),
+      GoRoute(
         path: '/login',
         name: 'login',
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) {
+          final selectedRole = state.extra as String?;
+          return LoginScreen(selectedRole: selectedRole);
+        },
       ),
       GoRoute(
         path: '/register',

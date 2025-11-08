@@ -6,6 +6,7 @@ import '../../../core/models/passenger.dart';
 import '../../../core/models/trip.dart';
 import '../../../core/models/vehicle.dart';
 import '../../../core/models/driver.dart';
+import '../../auth/providers/auth_provider.dart';
 
 /// 일반 회원(성인 탑승자) 홈 화면
 /// 본인의 운행 정보만 표시 (오늘 탈 차량, 기사, 실시간 위치)
@@ -130,7 +131,38 @@ class _PassengerHomeScreenState extends ConsumerState<PassengerHomeScreen> {
         title: const Text('홈'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.swap_horiz),
+            tooltip: '역할 전환',
+            onPressed: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('역할 전환'),
+                  content: const Text('다른 역할로 로그인하시겠습니까?\n현재 계정에서 로그아웃됩니다.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('취소'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('확인'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirmed == true && context.mounted) {
+                await ref.read(authStateProvider.notifier).logout();
+                if (context.mounted) {
+                  context.go('/welcome');
+                }
+              }
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.settings_outlined),
+            tooltip: '설정',
             onPressed: () {
               // TODO: 설정 화면으로 이동
             },
