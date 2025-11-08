@@ -7,6 +7,7 @@ import '../../../core/models/passenger.dart';
 import '../../../core/models/trip.dart';
 import '../../../core/models/vehicle.dart';
 import '../../auth/providers/auth_provider.dart';
+import 'driver_trip_detail_screen.dart';
 
 /// 운전자 전용 홈 화면
 /// 오늘 배정된 운행과 탑승자 체크리스트를 보여줍니다.
@@ -390,7 +391,13 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
                     margin: const EdgeInsets.only(bottom: 12),
                     child: InkWell(
                       onTap: () {
-                        context.push('/trips/${trip.id}');
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => DriverTripDetailScreen(
+                              tripId: trip.id,
+                            ),
+                          ),
+                        );
                       },
                       borderRadius: BorderRadius.circular(12),
                       child: Padding(
