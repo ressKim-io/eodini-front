@@ -380,26 +380,6 @@ class _DriverTripDetailScreenState
     return Scaffold(
       appBar: AppBar(
         title: Text(_route?.name ?? '운행 상세'),
-        actions: [
-          if (_trip?.status == TripStatus.pending)
-            TextButton.icon(
-              onPressed: _startTrip,
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('운행 시작'),
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.green,
-              ),
-            )
-          else if (_trip?.status == TripStatus.inProgress)
-            TextButton.icon(
-              onPressed: _completeTrip,
-              icon: const Icon(Icons.stop),
-              label: const Text('운행 완료'),
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.red,
-              ),
-            ),
-        ],
       ),
       body: Column(
         children: [
@@ -472,6 +452,65 @@ class _DriverTripDetailScreenState
           ),
         ],
       ),
+      // 하단 고정 버튼
+      bottomNavigationBar: _trip?.status != TripStatus.completed
+          ? SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: _trip?.status == TripStatus.pending
+                    ? ElevatedButton.icon(
+                        onPressed: _startTrip,
+                        icon: const Icon(Icons.play_arrow, size: 32),
+                        label: const Text(
+                          '운행 시작',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          minimumSize: const Size(double.infinity, 64),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      )
+                    : ElevatedButton.icon(
+                        onPressed: _completeTrip,
+                        icon: const Icon(Icons.check_circle, size: 32),
+                        label: const Text(
+                          '운행 완료',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          minimumSize: const Size(double.infinity, 64),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+              ),
+            )
+          : null,
     );
   }
 
@@ -486,6 +525,7 @@ class _DriverTripDetailScreenState
     return Column(
       children: [
         Card(
+          elevation: 3,
           child: InkWell(
             onTap: isDestination
                 ? null
@@ -497,24 +537,32 @@ class _DriverTripDetailScreenState
                 children: [
                   // 정류장 순서 아이콘
                   Container(
-                    width: 40,
-                    height: 40,
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
                       color: isDestination
                           ? theme.colorScheme.errorContainer
                           : theme.colorScheme.primaryContainer,
                       shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isDestination
+                            ? theme.colorScheme.error
+                            : theme.colorScheme.primary,
+                        width: 3,
+                      ),
                     ),
                     child: Center(
                       child: isDestination
                           ? Icon(
                               Icons.flag,
                               color: theme.colorScheme.error,
+                              size: 28,
                             )
                           : Text(
                               stop.order.toString(),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
+                                fontSize: 20,
                                 color: theme.colorScheme.primary,
                               ),
                             ),
@@ -593,13 +641,17 @@ class _DriverTripDetailScreenState
           ),
         ),
 
-        // 연결선
+        // 연결선 (타임라인 스타일)
         if (!isLast)
           Container(
-            margin: const EdgeInsets.only(left: 35),
-            width: 2,
-            height: 20,
-            color: theme.colorScheme.outline,
+            margin: const EdgeInsets.only(left: 39),
+            child: CustomPaint(
+              size: const Size(6, 40),
+              painter: _DottedLinePainter(
+                color: theme.colorScheme.primary.withOpacity(0.5),
+                strokeWidth: 4,
+              ),
+            ),
           ),
       ],
     );
@@ -751,4 +803,39 @@ class _DriverTripDetailScreenState
       ),
     );
   }
+}
+
+/// 점선을 그리는 CustomPainter
+class _DottedLinePainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+
+  _DottedLinePainter({
+    required this.color,
+    required this.strokeWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    const dashHeight = 5.0;
+    const dashSpace = 4.0;
+    double startY = 0;
+
+    while (startY < size.height) {
+      canvas.drawLine(
+        Offset(size.width / 2, startY),
+        Offset(size.width / 2, startY + dashHeight),
+        paint,
+      );
+      startY += dashHeight + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
