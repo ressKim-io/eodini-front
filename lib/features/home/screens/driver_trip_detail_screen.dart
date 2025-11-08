@@ -83,6 +83,8 @@ class _DriverTripDetailScreenState
         name: '강남 A코스',
         description: '강남구 일대 등원 경로',
         status: RouteStatus.active,
+        estimatedTime: 30, // 예상 소요 시간 30분
+        totalDistance: 5000, // 5km
         createdAt: DateTime.now().subtract(const Duration(days: 100)),
         updatedAt: DateTime.now(),
       );
@@ -97,7 +99,7 @@ class _DriverTripDetailScreenState
           latitude: 37.5665,
           longitude: 126.9780,
           order: 1,
-          estimatedArrival: 480, // 08:00 (분 단위)
+          estimatedArrivalTime: 480, // 08:00 (분 단위)
           createdAt: DateTime.now().subtract(const Duration(days: 100)),
           updatedAt: DateTime.now(),
         ),
@@ -109,7 +111,7 @@ class _DriverTripDetailScreenState
           latitude: 37.5000,
           longitude: 127.0360,
           order: 2,
-          estimatedArrival: 490, // 08:10
+          estimatedArrivalTime: 490, // 08:10
           createdAt: DateTime.now().subtract(const Duration(days: 100)),
           updatedAt: DateTime.now(),
         ),
@@ -121,7 +123,7 @@ class _DriverTripDetailScreenState
           latitude: 37.5088,
           longitude: 127.0630,
           order: 3,
-          estimatedArrival: 500, // 08:20
+          estimatedArrivalTime: 500, // 08:20
           createdAt: DateTime.now().subtract(const Duration(days: 100)),
           updatedAt: DateTime.now(),
         ),
@@ -133,7 +135,7 @@ class _DriverTripDetailScreenState
           latitude: 37.5150,
           longitude: 127.0200,
           order: 4,
-          estimatedArrival: 510, // 08:30
+          estimatedArrivalTime: 510, // 08:30
           createdAt: DateTime.now().subtract(const Duration(days: 100)),
           updatedAt: DateTime.now(),
         ),
@@ -541,7 +543,7 @@ class _DriverTripDetailScreenState
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              _formatTime(stop.estimatedArrival ?? 0),
+                              _formatTime(stop.estimatedArrivalTime),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurfaceVariant,
                               ),
