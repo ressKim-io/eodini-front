@@ -32,13 +32,34 @@ class AuthRepository {
         _logger.d('🎭 Mock API 사용 중...');
         await Future.delayed(const Duration(seconds: 1)); // 네트워크 지연 시뮬레이션
 
+        // 이메일에 따라 역할 결정
+        UserRole mockRole = UserRole.parent;
+        String mockName = '테스트 사용자';
+
+        if (dto.email.contains('driver')) {
+          mockRole = UserRole.driver;
+          mockName = '김기사';
+        } else if (dto.email.contains('admin')) {
+          mockRole = UserRole.admin;
+          mockName = '관리자';
+        } else if (dto.email.contains('passenger')) {
+          mockRole = UserRole.passenger;
+          mockName = '이승객';
+        } else if (dto.email.contains('parent')) {
+          mockRole = UserRole.parent;
+          mockName = '홍학부모';
+        } else if (dto.email.contains('attendant')) {
+          mockRole = UserRole.attendant;
+          mockName = '박동승';
+        }
+
         // Mock 사용자 데이터
         final mockUser = User(
-          id: 'mock-user-id-123',
+          id: 'mock-user-${mockRole.name}-123',
           email: dto.email,
-          name: '테스트 사용자',
+          name: mockName,
           phone: '010-1234-5678',
-          role: UserRole.parent,
+          role: mockRole,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
@@ -49,7 +70,7 @@ class AuthRepository {
           user: mockUser,
         );
 
-        _logger.d('✅ Mock 로그인 성공: ${loginResponse.user.name}');
+        _logger.d('✅ Mock 로그인 성공: ${loginResponse.user.name} (${mockRole.name})');
         return loginResponse;
       }
 
