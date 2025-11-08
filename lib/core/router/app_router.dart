@@ -5,6 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
+import '../../features/auth/screens/user_type_selection_screen.dart';
+import '../../features/auth/screens/parent_register_screen.dart';
+import '../../features/auth/screens/passenger_register_screen.dart';
+import '../../features/auth/screens/driver_register_screen.dart';
 import '../../features/driver/screens/driver_detail_screen.dart';
 import '../../features/driver/screens/driver_form_screen.dart';
 import '../../features/driver/screens/drivers_screen.dart';
@@ -32,7 +36,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final isAuthenticated = authState.isAuthenticated;
       final isLoggingIn = state.matchedLocation == '/login';
-      final isRegistering = state.matchedLocation == '/register';
+      final isRegistering = state.matchedLocation == '/register' ||
+          state.matchedLocation == '/register/select' ||
+          state.matchedLocation == '/register/parent' ||
+          state.matchedLocation == '/register/passenger' ||
+          state.matchedLocation == '/register/driver';
 
       // 인증되지 않은 사용자가 로그인/회원가입 페이지가 아닌 곳에 접근하려고 하면 로그인 페이지로
       if (!isAuthenticated && !isLoggingIn && !isRegistering) {
@@ -56,6 +64,30 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/register',
         name: 'register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      // 회원가입 유형 선택
+      GoRoute(
+        path: '/register/select',
+        name: 'register-select',
+        builder: (context, state) => const UserTypeSelectionScreen(),
+      ),
+      // 보호자 회원가입
+      GoRoute(
+        path: '/register/parent',
+        name: 'register-parent',
+        builder: (context, state) => const ParentRegisterScreen(),
+      ),
+      // 일반 회원(성인 탑승자) 회원가입
+      GoRoute(
+        path: '/register/passenger',
+        name: 'register-passenger',
+        builder: (context, state) => const PassengerRegisterScreen(),
+      ),
+      // 운전자 회원가입
+      GoRoute(
+        path: '/register/driver',
+        name: 'register-driver',
+        builder: (context, state) => const DriverRegisterScreen(),
       ),
       GoRoute(
         path: '/home',

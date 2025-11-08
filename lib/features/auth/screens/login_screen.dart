@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../providers/auth_provider.dart';
-import 'register_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -53,11 +53,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _navigateToRegister() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const RegisterScreen(),
-      ),
-    );
+    context.push('/register/select');
   }
 
   @override
